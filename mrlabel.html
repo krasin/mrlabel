@@ -20,8 +20,11 @@
       return;
     }
     $("#cur_image").attr("src", questions[questionIdx]);
+    if (questionIdx+1 < questions.length) {
+      $("#preload_image").attr("src", questions[questionIdx+1]);
+    }
   }
-    
+
   $(document).ready(function() {
     questions = [];
     var lines = images_str.split("\n");
@@ -52,5 +55,6 @@
 </head>
 <body>
   <img id="cur_image" />
+  <img id="preload_image" style="display:none" />
 </body>
 </html>
