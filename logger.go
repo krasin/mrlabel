@@ -13,10 +13,14 @@ func serveMain(w http.ResponseWriter, req *http.Request) {
 	http.ServeFile(w, req, "mrlabel.html")
 }
 
-func readLines(fname string) ([]string, error) {
+func readLines(fname string, mustExist bool) ([]string, error) {
 	data, err := ioutil.ReadFile(fname)
-	if err != nil {
+	if err != nil && (!os.IsNotExist(err) || mustExist) {
 		return nil, err
+	}
+	if err != nil {
+		// File does not exist, empty list.
+		return nil, nil
 	}
 	lines := strings.Split(string(data), "\n")
 	var res []string
@@ -33,13 +37,13 @@ func serveImages(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.Header().Set("Pragma", "no-cache")
 	w.Header().Set("Expires", "0")
-	images, err := readLines("images.txt")
+	images, err := readLines("images.txt", true)
 	if err != nil {
 		log.Print(err)
 		http.Error(w, "Could not read images.txt", 500)
 		return
 	}
-	labels, err := readLines("labels.txt")
+	labels, err := readLines("labels.txt", false)
 	if err != nil {
 		log.Print(err)
 		http.Error(w, "Could not read labels.txt", 500)
