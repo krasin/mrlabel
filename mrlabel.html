@@ -21,7 +21,10 @@
     }
     $("#cur_image").attr("src", questions[questionIdx]);
     if (questionIdx+1 < questions.length) {
-      $("#preload_image").attr("src", questions[questionIdx+1]);
+      $("#preload_image1").attr("src", questions[questionIdx+1]);
+    }
+    if (questionIdx+2 < questions.length) {
+      $("#preload_image2").attr("src", questions[questionIdx+2]);
     }
   }
 
@@ -55,6 +58,7 @@
 </head>
 <body>
   <img id="cur_image" />
-  <img id="preload_image" style="display:none" />
+  <img id="preload_image1" style="display:none" />
+  <img id="preload_image2" style="display:none" />
 </body>
 </html>
