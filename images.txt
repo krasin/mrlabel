@@ -1,0 +1,8 @@
+images_str = `
+https://c1.staticflickr.com/1/145/401930619_c6ce5e6f54_z.jpg
+https://c2.staticflickr.com/2/1277/544039269_8ea81c5984_b.jpg
+https://c1.staticflickr.com/9/8171/8027100076_b31678c15d.jpg
+https://c1.staticflickr.com/1/162/329850668_fe2aebed01.jpg
+https://c2.staticflickr.com/6/5343/8951214527_426d4da0dd_b.jpg
+https://c2.staticflickr.com/6/5307/5623746543_05c3975b10_b.jpg
+`
