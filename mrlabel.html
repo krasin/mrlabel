@@ -47,7 +47,7 @@
       }
       var ans = (event.which == 48)?"0":"1"
       console.log(questions[questionIdx] + " " + ans);
-      $.post("http://localhost:10000/log", { "image": questions[questionIdx], "label": ans })
+      $.post("/log", { "image": questions[questionIdx], "label": ans })
       nextQuestion();
     });
   });

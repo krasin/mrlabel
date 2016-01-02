@@ -5,7 +5,22 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
+
+func serveStatic(w http.ResponseWriter, req *http.Request) {
+	path := strings.TrimPrefix(req.URL.Path, "/")
+	log.Printf("path: %q", path)
+	switch path {
+	case "":
+		path = "mrlabel.html"
+	case "images.txt":
+	default:
+		http.Error(w, "Not found", 404)
+		return
+	}
+	http.ServeFile(w, req, path)
+}
 
 func logAnswer(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", req.Header.Get("Origin"))
@@ -27,6 +42,8 @@ func logAnswer(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	http.HandleFunc("/", serveStatic)
+	http.HandleFunc("/images.txt", serveStatic)
 	http.HandleFunc("/log", logAnswer)
 	log.Fatal(http.ListenAndServe(":10000", nil))
 }
