@@ -3,20 +3,22 @@
   <script src="images.txt"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <script>
-  was = {}
-  function nextQuestion() {
-    while (true) {
-      if (Object.keys(was).length >= questions.length) {
-        questionIdx = -1;
-        $("#cur_image").attr("src", "https://c2.staticflickr.com/2/1073/534211112_5e7bbc2333_b.jpg");
-        return;
-      }
-      questionIdx = Math.floor(Math.random() * questions.length) % questions.length;
-      if (!was[questionIdx]) {
-        break;
-      }
+  function permuteQuestions() {
+    for (var i = 0; i < questions.length - 1; i++) {
+      var len = questions.length - i - 1;
+      var idx = i + 1 + Math.floor(Math.random() * len) % len;
+      var tmp = questions[idx];
+      questions[idx] = questions[i];
+      questions[i] = tmp;
     }
-    was[questionIdx] = true;
+  }
+  questionIdx = -1;
+  function nextQuestion() {
+    questionIdx++;
+    if (questionIdx >= questions.length) {
+      $("#cur_image").attr("src", "https://c2.staticflickr.com/2/1073/534211112_5e7bbc2333_b.jpg");
+      return;
+    }
     $("#cur_image").attr("src", questions[questionIdx]);
   }
     
@@ -31,12 +33,13 @@
       questions.push(line);
     }
     console.log("loaded " + questions.length + " questions.");
+    permuteQuestions();
     nextQuestion();
     $("body").keyup(function(event) {
       if (event.which != 48 /*0*/ && event.which != 49 /*1*/) {
         return;
       }
-      if (questionIdx < 0) {
+      if (questionIdx < 0 || questionIdx >= questions.length) {
         return;
       }
       var ans = (event.which == 48)?"0":"1"
