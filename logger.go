@@ -2,24 +2,61 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 )
 
-func serveStatic(w http.ResponseWriter, req *http.Request) {
-	path := strings.TrimPrefix(req.URL.Path, "/")
-	log.Printf("path: %q", path)
-	switch path {
-	case "":
-		path = "mrlabel.html"
-	case "images.txt":
-	default:
-		http.Error(w, "Not found", 404)
+func serveMain(w http.ResponseWriter, req *http.Request) {
+	http.ServeFile(w, req, "mrlabel.html")
+}
+
+func readLines(fname string) ([]string, error) {
+	data, err := ioutil.ReadFile(fname)
+	if err != nil {
+		return nil, err
+	}
+	lines := strings.Split(string(data), "\n")
+	var res []string
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line != "" {
+			res = append(res, line)
+		}
+	}
+	return res, nil
+}
+
+func serveImages(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+	images, err := readLines("images.txt")
+	if err != nil {
+		log.Print(err)
+		http.Error(w, "Could not read images.txt", 500)
 		return
 	}
-	http.ServeFile(w, req, path)
+	labels, err := readLines("labels.txt")
+	if err != nil {
+		log.Print(err)
+		http.Error(w, "Could not read labels.txt", 500)
+		return
+	}
+	was := make(map[string]bool)
+	for _, label := range labels {
+		key := strings.Split(label, " ")[0]
+		was[key] = true
+	}
+	fmt.Fprintln(w, "images_str = `")
+	for _, image := range images {
+		if !was[image] {
+			fmt.Fprintln(w, image)
+		}
+	}
+	fmt.Fprintln(w, "`")
 }
 
 func logAnswer(w http.ResponseWriter, req *http.Request) {
@@ -42,8 +79,8 @@ func logAnswer(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", serveStatic)
-	http.HandleFunc("/images.txt", serveStatic)
+	http.HandleFunc("/", serveMain)
+	http.HandleFunc("/images.txt", serveImages)
 	http.HandleFunc("/log", logAnswer)
 	log.Fatal(http.ListenAndServe(":10000", nil))
 }
