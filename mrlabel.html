@@ -6,6 +6,11 @@
   was = {}
   function nextQuestion() {
     while (true) {
+      if (Object.keys(was).length >= questions.length) {
+        questionIdx = -1;
+        $("#cur_image").attr("src", "https://c2.staticflickr.com/2/1073/534211112_5e7bbc2333_b.jpg");
+        return;
+      }
       questionIdx = Math.floor(Math.random() * questions.length) % questions.length;
       if (!was[questionIdx]) {
         break;
@@ -29,6 +34,9 @@
     nextQuestion();
     $("body").keyup(function(event) {
       if (event.which != 48 /*0*/ && event.which != 49 /*1*/) {
+        return;
+      }
+      if (questionIdx < 0) {
         return;
       }
       var ans = (event.which == 48)?"0":"1"
