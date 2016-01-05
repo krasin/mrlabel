@@ -42,11 +42,11 @@
       questions.push(line);
     }
     console.log("loaded " + questions.length + " questions.");
-    num_classes = 0;
+    num_buttons = 0;
     $("button").each(function(index) {
-      num_classes += 1;
+      num_buttons += 1;
       $(this).button().click(function(ev) {
-        i = index + 1;
+        i = index;
         console.log(i);
         if (questionIdx < 0 || questionIdx >= questions.length) {
           return;
@@ -55,10 +55,11 @@
         nextQuestion();
       });
     });
+    num_classes = num_buttons - 1;
     permuteQuestions();
     nextQuestion();
     $("body").keyup(function(event) {
-      if (event.which < 49 /*1*/ || event.which >= 49 + num_classes) {
+      if (event.which < 48 /*0*/ || event.which >= 49 + num_classes) {
         return;
       }
       if (questionIdx < 0 || questionIdx >= questions.length) {
@@ -74,13 +75,11 @@
 </head>
 <body>
   <div id="buttons">
-    <button>One Building</button>
-    <button>Part(s) of building(s)</button>
-    <button>No buildings</button>
-    <button>Indoors</button>
-    <button>Gate/Arch/Fountain/etc</button>
-    <button>Bridge</button>
-    <button>Multiple Things</button>
+    <button>No label</button>
+    <button>No main subject (including indoors and 3d renders)</button>
+    <button>Building, or part of one</button>
+    <button>Other types of buildings/structures</button>
+    <button>Not a building/structure</button>
   </div>
   <img id="cur_image" />
   <img id="preload_image1" style="display:none" />
