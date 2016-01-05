@@ -6,7 +6,7 @@ mrLabel - simple web frontend to label images.
 
 2) Go to http://localhost:10000/
 
-3) for each image, press 0..N to label it. Alternatively, click on the coresponing button.
+3) for each image, press 0..N to label it. Alternatively, click on the coresponding button.
 
 4) collect your labels from labels.txt
 
