@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -8,12 +9,15 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 var port = flag.Int("port", 10000, "Port to serve HTTP frontend on")
 
+var mrlabelHtml = MustAsset("data/mrlabel.html")
+
 func serveMain(w http.ResponseWriter, req *http.Request) {
-	http.ServeFile(w, req, "mrlabel.html")
+	http.ServeContent(w, req, "data/mrlabel.html", time.Time{}, bytes.NewReader(mrlabelHtml))
 }
 
 func serveStatic(w http.ResponseWriter, req *http.Request) {
