@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 	"time"
 )
@@ -17,6 +18,15 @@ var port = flag.Int("port", 10000, "Port to serve HTTP frontend on")
 var mrlabelHtml = MustAsset("data/mrlabel.html")
 
 func serveMain(w http.ResponseWriter, req *http.Request) {
+	if strings.HasSuffix(req.URL.Path, ".jpg") && strings.HasPrefix(req.URL.Path, "/") {
+		fname := path.Clean("." + req.URL.Path)
+		if path.IsAbs(fname) || strings.HasPrefix(fname, "..") {
+			http.Error(w, fmt.Sprintf("absolute and out-of-scope paths are prohibited: %s", req.URL.Path), 403)
+			return
+		}
+		http.ServeFile(w, req, fname)
+		return
+	}
 	http.ServeContent(w, req, "data/mrlabel.html", time.Time{}, bytes.NewReader(mrlabelHtml))
 }
 
