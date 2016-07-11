@@ -1,16 +1,32 @@
 package main
 
 import (
+	"bytes"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
+var port = flag.Int("port", 10000, "Port to serve HTTP frontend on")
+
+var mrlabelHtml = MustAsset("data/mrlabel.html")
+
 func serveMain(w http.ResponseWriter, req *http.Request) {
-	http.ServeFile(w, req, "mrlabel.html")
+	http.ServeContent(w, req, "data/mrlabel.html", time.Time{}, bytes.NewReader(mrlabelHtml))
+}
+
+func serveStatic(w http.ResponseWriter, req *http.Request) {
+	fname := req.URL.Path
+	if fname[0] == '/' {
+		fname = fname[1:]
+	}
+	log.Printf("Serving %s", fname)
+	http.ServeFile(w, req, fname)
 }
 
 func readLines(fname string, mustExist bool) ([]string, error) {
@@ -83,8 +99,11 @@ func logAnswer(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	flag.Parse()
+
 	http.HandleFunc("/", serveMain)
+	http.HandleFunc("/static/", serveStatic)
 	http.HandleFunc("/images.txt", serveImages)
 	http.HandleFunc("/log", logAnswer)
-	log.Fatal(http.ListenAndServe(":10000", nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 }
