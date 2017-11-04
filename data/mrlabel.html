@@ -4,6 +4,18 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+  <style>
+  .patchView {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+  }
+  </style>
   <script>
 
   function permuteQuestions() {
@@ -31,7 +43,25 @@
     }
   }
 
+  function drawMask() {
+    var canvas = document.getElementById("maskCanvas");
+    var ctx = canvas.getContext('2d');
+    // Draw red box to highlight the center patch.
+    ctx.lineWidth = 1;
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "rgb(255,0,0)";
+    ctx.beginPath();
+    var half = 16 * 2; // We magnify the original image by 2x.
+    ctx.moveTo(canvas.width / 2 - half, canvas.height / 2 - half);
+    ctx.lineTo(canvas.width / 2 + half, canvas.height / 2 - half);
+    ctx.lineTo(canvas.width / 2 + half, canvas.height / 2 + half);
+    ctx.lineTo(canvas.width / 2 - half, canvas.height / 2 + half);
+    ctx.lineTo(canvas.width / 2 - half, canvas.height / 2 - half);
+    ctx.stroke();
+  }
+
   $(document).ready(function() {
+    drawMask();
     questions = [];
     var lines = images_str.split("\n");
     for (var i = 0; i < lines.length; i++) {
@@ -82,7 +112,11 @@
     <button>Not a building/structure</button>
   </div>
   <br>
-  <img id="cur_image" style="width:20%; height:20% />
+  <div style="position:relative;width:256px;height:256px;">
+    <img id="cur_image" style="width:256px;height:256px" class="patchView"/>
+    <canvas id="maskCanvas" width="256" height="256" style="width:256px;height:256px" class="patchView"></canvas>
+  </div>
+
   <img id="preload_image1" style="display:none" />
   <img id="preload_image2" style="display:none" />
 </body>
