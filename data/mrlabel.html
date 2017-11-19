@@ -43,25 +43,7 @@
     }
   }
 
-  function drawMask() {
-    var canvas = document.getElementById("maskCanvas");
-    var ctx = canvas.getContext('2d');
-    // Draw red box to highlight the center patch.
-    ctx.lineWidth = 1;
-    ctx.lineJoin = "round";
-    ctx.strokeStyle = "rgb(255,0,0)";
-    ctx.beginPath();
-    var half = 16 * 2; // We magnify the original image by 2x.
-    ctx.moveTo(canvas.width / 2 - half, canvas.height / 2 - half);
-    ctx.lineTo(canvas.width / 2 + half, canvas.height / 2 - half);
-    ctx.lineTo(canvas.width / 2 + half, canvas.height / 2 + half);
-    ctx.lineTo(canvas.width / 2 - half, canvas.height / 2 + half);
-    ctx.lineTo(canvas.width / 2 - half, canvas.height / 2 - half);
-    ctx.stroke();
-  }
-
   $(document).ready(function() {
-    drawMask();
     questions = [];
     var lines = images_str.split("\n");
     for (var i = 0; i < lines.length; i++) {
@@ -72,24 +54,10 @@
       questions.push(line);
     }
     console.log("loaded " + questions.length + " questions.");
-    num_buttons = 0;
-    $("button").each(function(index) {
-      num_buttons += 1;
-      $(this).button().click(function(ev) {
-        i = index;
-        console.log(i);
-        if (questionIdx < 0 || questionIdx >= questions.length) {
-          return;
-        }
-        $.post("/log", { "image": questions[questionIdx], "label": i })
-        nextQuestion();
-      });
-    });
-    num_classes = num_buttons - 1;
     permuteQuestions();
     nextQuestion();
     $("body").keyup(function(event) {
-      if (event.which < 48 /*0*/ || event.which >= 49 + num_classes) {
+      if (event.which < 48 /*0*/ || event.which >= 57 /*9*/) {
         return;
       }
       if (questionIdx < 0 || questionIdx >= questions.length) {
@@ -104,17 +72,9 @@
   </script>
 </head>
 <body>
-  <div id="buttons">
-    <button>No label</button>
-    <button>No main subject (including indoors and 3d renders)</button>
-    <button>Building, or part of one</button>
-    <button>Other types of buildings/structures</button>
-    <button>Not a building/structure</button>
-  </div>
   <br>
   <div style="position:relative;width:256px;height:256px;">
     <img id="cur_image" style="width:256px;height:256px" class="patchView"/>
-    <canvas id="maskCanvas" width="256" height="256" style="width:256px;height:256px" class="patchView"></canvas>
   </div>
 
   <img id="preload_image1" style="display:none" />
