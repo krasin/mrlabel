@@ -108,6 +108,27 @@ func logAnswer(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func undoAnswer(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", req.Header.Get("Origin"))
+	labels, err := readLines("labels.txt", false)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, "Could not read labels.txt", 500)
+		return
+	}
+	if len(labels) == 0 {
+		log.Print("undoAnswer: no labels to delete. Doing nothing.")
+		return
+	}
+	labels = labels[:len(labels)-1]
+	data := []byte(strings.Join(labels, "\n") + "\n")
+	if err = ioutil.WriteFile("labels.txt", data, 0644); err != nil {
+		log.Print(err)
+		http.Error(w, "Could not rewrite the file with labels", 500)
+		return
+	}
+}
+
 func main() {
 	flag.Parse()
 
@@ -115,5 +136,6 @@ func main() {
 	http.HandleFunc("/static/", serveStatic)
 	http.HandleFunc("/images.txt", serveImages)
 	http.HandleFunc("/log", logAnswer)
+	http.HandleFunc("/undo", undoAnswer)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 }

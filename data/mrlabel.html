@@ -57,6 +57,13 @@
     permuteQuestions();
     nextQuestion();
     $("body").keyup(function(event) {
+      if (event.which == 27 /* escape */ || event.which == 8 /* backspace */) {
+        console.log("Forgetting last answer");
+        $.post("/undo");
+        // We also reload the page to make sure the question with the removed answer is in the queue again.
+        window.location.reload(true);
+        return;
+      }
       if (event.which < 48 /*0*/ || event.which >= 57 /*9*/) {
         return;
       }
